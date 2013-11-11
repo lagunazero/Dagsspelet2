@@ -1,0 +1,6 @@
+/tmp
+/game/*.rpyc
+/game/bytecode.rpyb
+/errors.txt
+/log.txt
+/traceback.txt
