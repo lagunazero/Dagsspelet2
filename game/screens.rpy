@@ -164,7 +164,7 @@ screen nvl:
 
     add SideImage() xalign 0.0 yalign 1.0
     
-    use quick_menu
+    #use quick_menu
         
 ##############################################################################
 # Main Menu 
@@ -540,4 +540,56 @@ init -2 python:
     config.default_afm_time = 10
     config.default_afm_enable = False
     
+
+
+
+######################################################################
+# Inventory
+#
+#
+
+screen inventory_button:
+    vbox xpos 0.5 xanchor 0.5 yalign 0.95:
+        textbutton "Check pockets" action ui.callsinnewcontext("inventory_screen_label")
+
+screen inventory_screen:
+    frame:
+        xpos 0.5
+        xanchor 0.5
+        yalign 0.95
+        has vbox:
+            for item in inventory.items:
+                text "[item.name]"
+            text "Cash: [inventory.cash]"
+            textbutton "Close" action Return() xalign 0.5
+
+label inventory_screen_label:
+    call screen inventory_screen
+    return
     
+    
+######################################################################
+# Character cheating
+#
+#
+
+screen char_cheat_button:
+    vbox xpos 0.0 yalign 1.0:
+        textbutton "Characters" action ui.callsinnewcontext("char_cheat_screen_label")
+
+screen char_cheat_screen:
+    frame:
+        xpos 0.0
+        yalign 1.0
+        has vbox:
+            for char in chars:
+                text "Name: [char.full_name]"
+                text "AKA: [char.name]"
+                text "Loc: [char.location]"
+                text "Like: [char.affection]"
+                text ""
+            textbutton "Return" action Return()
+
+label char_cheat_screen_label:
+    call screen char_cheat_screen
+    return

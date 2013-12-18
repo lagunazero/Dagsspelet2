@@ -1,30 +1,41 @@
 label day_1_start:
 
-    $ d1_adam_greeted = False
-    $ d1_adam_introduced = False
-    $ d1_adam_discussed_book = False
-    $ d1_adam_shown_bnw = False
-    $ d1_adam_ask_conductor = ""
-    $ d1_complete = False
-    $ d1_compartment_tried_sleep = False
-    $ d1_compartment_window_seen = False
-    $ d1_compartment_left = False
-    $ d1_hallway_seen = False
-    $ d1_neighbour_compartment_open = False
-    $ d1_neighbour_compartment_seen_lock = False
-    $ d1_neighbour_compartment_has_waited = False
-    $ d1_neighbour_compartment_has_knocked = False
-    $ d1_dining_car_seen = False
-    $ d1_dining_car_looked_around = False
-    $ d1_dining_car_ordered = False
-    $ d1_dining_car_book_left = False
-    $ d1_dining_car_book_left = False
-    $ d1_dining_car_book_taken = False
-    $ d1_searched_conductor = 0
+    python:
+        #New stuff for the day
+        stuff.book_brave_new_world = InventoryItem("Brave New World")
+
+        #Setting 'em globals
+        globals.day = 1
+        globals.time = "Evening"
+        player.move(locs.train_comp_7)
+
+        #The variables of the day
+        d1 = {}
+        d1.adam_greeted = False
+        d1.adam_introduced = False
+        d1.adam_discussed_book = False
+        d1.adam_shown_bnw = False
+        d1.adam_ask_conductor = ""
+        d1.complete = False
+        d1.compartment_tried_sleep = False
+        d1.compartment_window_seen = False
+        d1.compartment_left = False
+        d1.hallway_seen = False
+        d1.neighbour_compartment_open = False
+        d1.neighbour_compartment_seen_lock = False
+        d1.neighbour_compartment_has_waited = False
+        d1.neighbour_compartment_has_knocked = False
+        d1.neighbour_compartment_has_given_up = False
+        d1.dining_car_seen = False
+        d1.dining_car_looked_around = False
+        d1.dining_car_ordered = False
+        d1.dining_car_book_left = False
+        d1.dining_car_book_left = False
+        d1.searched_conductor = 0
 
     nvl clear
     "DUB-DUB. DUB-DUB. DUB-DUB." #TODO SFX: Train dub-dub
-    "Before opening my eyes, I stretch my arms as far up as I could and slowly rotate my head from left to right. The seat's wood-hard padding hadn't done much to make an already uncomfortable trip - in double meaning - any nicer."
+    "Before opening my eyes, I stretch my arms as far up as I can and slowly rotate my head from left to right. The seat's wood-hard padding hadn't done much to make an already uncomfortable trip - in double meaning - any nicer."
     "Looking upwards, I spot a No Smoking sign half buried beneath layers of dust and dirt. The stuffy air makes me doubt it's ever been adhered to."
     "Taking a deep breath, I can't help but start coughing. It's probably been close to 12 hours since last I ate, and at least half that since the last cup of anything."
     "Should probably do something about that."
@@ -35,21 +46,22 @@ label day_1_start:
     "Opposite to me sits a man that my nap had made me forget. Or maybe he hadn't been there before, I'm not sure."
     "He sits with a straight back and folded legs, as though having no problem at all with the lackluster seats. His plain white shirt is tucked neatly into the black pants. Can he have dropped his tie? Or bowtie, maybe."
     "Upon noticing my gaze he raises a wasp-striped book in between our eyes."
-    jump menu_train_compartment
+    jump location_train_compartment_7
 
-label menu_train_compartment:
-    if d1_adam_greeted and d1_dining_car_seen and d1_adam_introduced == False and d1_adam_ask_conductor == "":
+label location_train_compartment_7:
+    $ player.location = "Train - Compartment 7"
+    if d1.adam_greeted and d1.dining_car_seen and d1.adam_introduced == False and d1.adam_ask_conductor == "":
         jump train_compartment_pa_delay
     else:
         menu:
-            "Greet the other passenger" if d1_adam_ask_conductor == "" and d1_adam_introduced == False and an_location == "train_compartment":
+            "Greet the other passenger" if d1.adam_ask_conductor == "" and d1.adam_introduced == False and adam.at(player.location):
                 jump adam_greet
-            "Talk to the other passenger" if d1_adam_ask_conductor != "" and d1_adam_introduced == False and an_location == "train_compartment":
-                if d1_adam_ask_conductor == "agreed":
+            "Talk to the other passenger" if d1.adam_ask_conductor != "" and d1.adam_introduced == False and adam.at(player.location):
+                if d1.adam_ask_conductor == "agreed":
                     jump adam_search_conductor_agreed
                 else:
                     jump adam_search_conductor_refused
-            "Talk to Adam" if d1_adam_introduced and an_location == "train_compartment":
+            "Talk to Adam" if d1.adam_introduced and adam.at(player.location):
                 "He slowly takes down the book a few centimeters and looks at me across it."
                 an "What is it now?"
                 jump menu_adam_talk
@@ -71,26 +83,26 @@ label adam_search_conductor_agreed:
             me "No, haven't really looked yet."
             an "Then I don't see what you're talking to me."
             "He promptly begins to read again."
-            jump menu_train_compartment
+            jump location_train_compartment_7
 
 label adam_search_conductor_refused:
     nvl clear
     an ".....You've become cooperative yet?"
     menu:
         "\"Fine, I'll search for the conductor\"":
-            $ an_like += 1
-            $ d1_adam_ask_conductor = "agreed"
+            $ adam.like(1)
+            $ d1.adam_ask_conductor = "agreed"
             me "Fine, I'll search for the conductor."
             an "Ah!"
             "A row of teeth flashes by for an instant on the man's face, but then it's gone as quickly as it came."
             an "Fantastic."
             "Without a further word the man resumes reading."
-            jump menu_train_compartment
+            jump location_train_compartment_7
         "\"Nope\"":
             me "Nope."
             an "Bah!"
             "The man grunts and returns to his book."
-            jump menu_train_compartment
+            jump location_train_compartment_7
         "\"Actually, there's no conductor around\"":
             an "......"
             an "You've actually looked?"
@@ -99,25 +111,25 @@ label adam_search_conductor_refused:
                     me "No, not really."
                     an "Bah!"
                     "The man grunts and returns to his book."
-                    jump menu_train_compartment
+                    jump location_train_compartment_7
                 "\"Yeah\"":
                     me "Yeah. No conductor around."
                     jump adam_searched_conductor
 
 label train_compartment_window:
     nvl clear
-    if d1_compartment_window_seen:
+    if d1.compartment_window_seen:
         "I have to squint, if not straight up fantasize, to see any remains of the sun now."
         "Out in the middle of nowhere like this there's not exactly any city light to make up for the lack of a present sun, either, so I'm left in the dark."
         "Which consequently makes it rather dull to view."
     else:
-        $ d1_compartment_window_seen = True
+        $ d1.compartment_window_seen = True
         "I move my eyes from my bothered co-passenger and onto the compartment's sole window. Our eyes are amazing enough that focusing on the rapidly moving terrain beyond it means I can't even see the stains."
         "The last rays of the setting sun flashes rapidly between the trees of this continental forest, making me unvolountarily squint just as frequently. I can stand it for at least a short while because of how prettily the deep orange light outlines the tree silhouttes."
         "I try searching for animals for a few minutes, but the best I can come up with is a pile that might have been left there by a deer; but it might just as well be some roots, leaves and mud."
         nvl clear
         "Who knows, maybe I should try getting a career as a naturalist painter. Make a living recreating stuff like this."
-        "Well, maybe not the pile of could-be feces."
+        "Well, maybe not the pile of could-be feces. But the setting sun, outlined trees and sh--... and stuff."
         "According to the train schedule there's still plenty of time before we reach the next city, not to mention my destination."
         "That gives me plenty of chances to find motives that are more interesting than anything in this compartment."
         #TODO VFX: Flash Adam
@@ -125,34 +137,34 @@ label train_compartment_window:
         nvl clear
         "I finally sigh and turn back from the window. Trees are a nice change from being ignored, but they're not all that much better at responding to what I say or think."
         "...So they're not really all that much of a change."
-    jump menu_train_compartment
+    jump location_train_compartment_7
 
 label adam_greet:
     nvl clear
     #TODO VFX: Show Adam
-    if d1_adam_greeted:
+    if d1.adam_greeted:
         me "Umm, excuse me?"
         an "........"
     else:
         me "Hello?"
         an "........"
         an "Hrm."
-    $ d1_adam_greeted = True
-    jump menu_train_compartment
+    $ d1.adam_greeted = True
+    jump location_train_compartment_7
 
 label try_sleep:
     nvl clear
-    if d1_complete:
+    if d1.complete:
         "Finally a moment's peace."
         jump day_1_end
     else:
-        if d1_compartment_tried_sleep:
+        if d1.compartment_tried_sleep:
             "Before I even complete leaning against the hard back I know I won't be able to sleep in yet a little while."
             
             "During the few seconds that my eyes were closed, or on their way to being at least, the man across from me has turned another page."
             "Other than that the whole train car seems frozen in time, with only the soft thumping and the dim landscape indicating there's anything at all outside."
         else:
-            $ d1_compartment_tried_sleep = True
+            $ d1.compartment_tried_sleep = True
             "I lean back and shut my eyes again. Hopefully another couple hours' of shuteye will mean I'll wake up with an arrived train."
             "DUB-DUB."
             "DUB-DUB."
@@ -172,42 +184,49 @@ label try_sleep:
             "I could spend another hour or more sitting like this without getting any closer to sleep. And then what's the point?"
             nvl clear
             "I open my eyes again and look at the man across from me. He's still busy reading his book and ignoring me, unsurprisingly."
-        jump menu_train_compartment
+        jump location_train_compartment_7
 
 label train_compartment_leave:
     nvl clear
-    if d1_compartment_left == False:
-        $ d1_compartment_left = True
+    if d1.compartment_left == False:
+        $ d1.compartment_left = True
         "I get up from the seat and give it a look that I try to make as hard as its object, then head for the exit."
         "On my way I try to glance at the other passenger but he's doing a very capable job of conveniently placing the book he's reading right between us."
-    jump train_hallway
+    jump location_train_hallway
 
-label train_hallway:
+label location_train_hallway:
+    $ player.location = "Train - Hallway"
     nvl clear
-    if d1_hallway_seen:
-        "I emerge once more into the train's hallway."
+
+    if d1.hallway_seen:
+        "I once more face the train's hallway, ready for what may come."
     else:
-        $ d1_hallway_seen = True
+        $ d1.hallway_seen = True
         "Closing the sliding door behind me I enter a fairly long and quite narrow hallway. There are several compartments on each side of mine, likely about as interesting though perhaps lacking in the Ignoring Man department."
         "Maybe I ought to switch, huh?"
-    if d1_adam_ask_conductor == "agreed" and d1_searched_conductor == 0:
-        $ d1_searched_conductor += 1
-        "I look around for a conductor but the hallway's completely empty, save for myself."
-        "Usually I wouldn't be complaining about that, though."
-    jump menu_train_hallway
+        "Looking over my shoulder, there's a greasy plaque above the compartment door with a 7 on it. Unless it's a 1 with some guck on it."
+    if d1.adam_ask_conductor != "" and d1.searched_conductor == 0:
+        $ d1.searched_conductor += 1
+        if d1.adam_ask_conductor == "agreed":
+            "I look around for a conductor but the hallway's completely empty, save for myself."
+            "Usually I wouldn't be complaining about that, though."
+        else:
+            "While I never promised that I would take a look around for him, it doesn't stop me from investigating the matter for myself."
+            "If I'm feeling generous, maybe I'll even tell him what I find out."
+            "Regardless of my mood, there's little to be found here. Seems I'm alone in the hallway."
 
-menu menu_train_hallway:
-    "Go back to my compartment":
-        nvl clear
-        "Guess I don't have much to do out here anyway."
-        "I step back in and receive a brief, if even that, glance from my co-passenger before he resumes reading."
-        jump menu_train_compartment
-    "Enter the neighbouring compartment" if d1_neighbour_compartment_seen_lock == False:
-        jump neighbour_compartment_locked
-    "Knock on the neighbouring compartment" if d1_neighbour_compartment_seen_lock == True:
-        jump neighbour_compartment_knock
-    "Go to the dining car":
-        jump dining_car
+    menu:
+        "Enter compartment 6" if d1.neighbour_compartment_seen_lock == False:
+            jump neighbour_compartment_locked
+        "Knock on compartment 6" if d1.neighbour_compartment_seen_lock == True:
+            jump neighbour_compartment_knock
+        "Enter compartment 7":
+            nvl clear
+            "Guess I don't have much to do out here anyway."
+            "I step back in and receive a brief, if even that, glance from my co-passenger before he resumes reading."
+            jump location_train_compartment_7
+        "Go to the dining car":
+            jump location_dining_car
 
 label neighbour_compartment_knock:
     nvl clear
@@ -218,15 +237,15 @@ label neighbour_compartment_knock:
     "Another one..."
     "Another one..."
     menu menu_neighbour_compartment:
-        "Knock again" if d1_neighbour_compartment_has_knocked == False:
+        "Knock again" if d1.neighbour_compartment_has_knocked == False:
             jump neighbour_compartment_knock_again
-        "Wait some more" if d1_neighbour_compartment_has_waited == False:
+        "Wait some more" if d1.neighbour_compartment_has_waited == False:
             jump neighbour_compartment_knock_wait
         "Give it up":
             jump neighbour_compartment_knock_give_up
 
 label neighbour_compartment_knock_again:
-    $ d1_neighbour_compartment_has_knocked = True
+    $ d1.neighbour_compartment_has_knocked = True
     nvl clear
     "I give it one more go, this time knocking a bit harder."
     #TODO SFX: 3 strong knocks
@@ -238,31 +257,35 @@ label neighbour_compartment_knock_again:
     jump menu_neighbour_compartment
     
 label neighbour_compartment_knock_wait:
-    $ d1_neighbour_compartment_has_waited = True
+    $ d1.neighbour_compartment_has_waited = True
     nvl clear
-    "I'll show some patience. Maybe whoever's in there was asleep, like I was."
+    "I'll show some patience. I can be damn virtuous if I want. Maybe whoever's in there was asleep, like I was."
     "Or... maybe that person is an ignoring snob, like a certain someone else..."
     nvl clear
     "Regardless, waiting provokes no further response and it becomes evidently clear that there's no point in sticking around in silence longer than I already have."
     menu:
-        "Try knocking instead" if d1_neighbour_compartment_has_knocked == False:
+        "Try knocking instead" if d1.neighbour_compartment_has_knocked == False:
             jump neighbour_compartment_knock_again
         "Give it up":
             jump neighbour_compartment_knock_give_up
 
 label neighbour_compartment_knock_give_up:
     nvl clear
-    "It's not like I had a particularly good reason for getting in there to begin with, so it's not really worth making too much of a fuss over."
-    "But failing, no matter the subject, is never apppealing."
-    if d1_neighbour_compartment_has_knocked:
-        "Plus, this whole knocking thing must have made me look tremendously stupid to all the zero spectators."
-    "I turn around and give the empty train hallway another good look."
-    "It's still got just the same options as before. Unless I'm counting stupid things like hanging around locked doors."
-    jump menu_train_hallway
+    if d1.neighbour_compartment_has_given_up:
+        "So much for that."
+    else:
+        $ d1.neighbour_compartment_has_given_up = True
+        "It's not like I had a particularly good reason for getting in there to begin with, so it's not really worth making too much of a fuss over."
+        "But failing, no matter the subject, is never apppealing."
+        if d1.neighbour_compartment_has_knocked:
+            "Plus, this whole knocking thing must have made me look tremendously stupid to all the zero spectators."
+        "I turn around and give the empty train hallway another good look."
+        "It's still got just the same options as before. Unless I'm counting stupid things like hanging around locked doors."
+    jump location_train_hallway
 
 label neighbour_compartment_locked:
     nvl clear
-    $ d1_neighbour_compartment_seen_lock = True
+    $ d1.neighbour_compartment_seen_lock = True
     "I'll see what's in the compartment next door. Maybe I can stay there in isolation."
     "I don't have any cargo with me anyway, so I'm not really tied to my given seat. At least as long as no conductor makes a hassle, that is."
     "I place my hand in the sliding door's small socket and pull softly."
@@ -271,54 +294,55 @@ label neighbour_compartment_locked:
     nvl clear
     "Having tried this, I can still make my hardest to fool myself into retroactively having expected this. It's not like they'll want people wandering around."
     "Then again, it's not like my compartment was locked. Or maybe I just didn't lock it..."
-    jump menu_train_hallway
+    jump location_train_hallway
 
-label dining_car:
-    if d1_dining_car_seen:
+label location_dining_car:
+    $ player.location = "Train - Dining Car"
+    if d1.dining_car_seen:
         jump dining_car_2
     else:
         jump dining_car_1
         
 label dining_car_1:
-    $ d1_dining_car_seen = True
+    $ d1.dining_car_seen = True
     nvl clear
     "I leave the dull hallway and head for the dining car. I'm not particularly hungry, but at least it'll give me something to do."
     nvl clear
     "Just entering the dining car I'm assaulted by a thick smell of fried butter and red wine. There's an accompanying sheet of smoke pouring out from the door to the shut-off kitchen. Shouldn't the fire alarm be panicking right about now?"
     "From behind the kitchen door I can hear laughter and boisterous cheering, interspersed with clanking of glasses."
     "The car itself is spacious, mostly because there aren't any other passengers present."
-    if d1_adam_ask_conductor == "agreed" and d1_searched_conductor == 1:
-        $ d1_searched_conductor += 1
+    if d1.adam_ask_conductor != "" and d1.searched_conductor == 1:
+        $ d1.searched_conductor += 1
         "While there might be a conductor or two in the kitchen, I get the feeling no-one there would be of any help."
     menu menu_dining_car:
-        "Look around" if d1_dining_car_looked_around == False:
+        "Look around" if d1.dining_car_looked_around == False:
             jump dining_car_look
-        "Try to make an order" if d1_dining_car_ordered == False:
+        "Try to make an order" if d1.dining_car_ordered == False:
             jump dining_car_order
-        "Take the book" if d1_dining_car_book_left == True and d1_dining_car_book_taken == False:
+        "Take the book" if d1.dining_car_book_left == True and inventory.has(stuff.book_brave_new_world) == False:
             "I return to the table where I put back the forgotten book and pick it up."
             jump dining_car_book_take
         "Head back to the hallway":
             nvl clear
             "Not much else to do here."
-            jump menu_train_hallway
+            jump location_train_hallway
 
 label dining_car_2:
     nvl clear
     "I return to the dining car. It's still empty, aside from the formidable wall of smoke emitted from the kitchen. I can still hear rowdy voices from inside."
-    if d1_adam_ask_conductor == "agreed" and d1_searched_conductor == 1:
-        $ d1_searched_conductor += 1
+    if d1.adam_ask_conductor != "" and d1.searched_conductor == 1:
+        $ d1.searched_conductor += 1
         "While there might be a conductor or two in the kitchen, I get the feeling no-one there would be of any help."
     jump menu_dining_car
 
 label dining_car_look:
-    $ d1_dining_car_looked_around = True
+    $ d1.dining_car_looked_around = True
     nvl clear
     "I ignore the smoking kitchen and take a look around the deserted dining area instead."
-    "There are about a dozen small tables in all, with chair shoe-horned into whatever free space there is. How anyone can pass through here when it's full of people?"
+    "There are about a dozen small tables in all, with chairs shoe-horned into whatever free space there is. How anyone can pass through here when it's full of people?"
     "The interior's fancy decor - some satin here and some mahogany there - is not enough to hide that the whole place is closer to a freeway lunch bar than the \"World Cuisine in a 100-Wheeled Palace\" that's promised on an old poster by the entrance. There's hardly a chair whose seat isn't showing its filling or a table without greasy stains and scratches deeper than a dining knife could cause."
     nvl clear
-    "Strolling around the empty car with a slightly disdainful, but not really caring, look on my face I spot a fairly thin, gray book on the floor underneath a corner table."
+    "Strolling around the empty car with a slightly disdainful look on my face I spot a fairly thin, gray book on the floor underneath a corner table."
     "I reach down and pick it up, wiping away some food crusts."
     "Aldous Huxley, Brave New World."
     "The cover shows a disconcerting close-up of a white face with wide-open eyes."
@@ -327,9 +351,9 @@ label dining_car_look:
             jump dining_car_book_take
         "Leave it":
             jump dining_car_book_leave
-    
+
 label dining_car_book_take:
-    $ d1_dining_car_book_taken = True
+    $ inventory.add(stuff.book_brave_new_world)
     nvl clear
     "Regardless of whether I want it or not, it should at least help me pass the time."
     "I don't think I feel like sitting around here reading it, though. The owner might show up."
@@ -337,24 +361,24 @@ label dining_car_book_take:
     jump menu_dining_car
 
 label dining_car_book_leave:
-    $ d1_dining_car_book_left = True
+    $ d1.dining_car_book_left = True
     nvl clear
     "I decide not to take it, putting it back on top of the table under which it had been. At least that's a slightly more dignified place to be."
     jump menu_dining_car
 
 label dining_car_order:
-    $ d1_dining_car_ordered = True
+    $ d1.dining_car_ordered = True
     nvl clear
     "I pick a table at random and take a seat. Glancing over the menu it seems they don't intend for economic class passengers like me to eat here."
     "Maybe I can at least get one of the starters and something to drink. My throat's killing me and, given half a moment's attention, my stomach seems to be in a similar condition."
     menu:
         "Pick Caviar Canapés":
             jump dining_car_order_2
-        "Pick Beet Salad":
-            jump dining_car_order_2
         "Pick Lobster Bisque":
             jump dining_car_order_2
-        "Pick Caesar Salad":
+        "Pick Beet Salad":
+            jump dining_car_order_2
+        "Pick Caesar Salad de Luxe":
             jump dining_car_order_2
 
 label dining_car_order_2:
@@ -373,7 +397,7 @@ label dining_car_order_2:
     nvl clear
     "I get up from the chair with a sigh."
     "If the personnel is this engaged with the table waiting my hopes sink pretty low with regards to the served food. Maybe I'll have more luck tomorrow."
-    "My stomach will at least force me to be a lot more insistent."
+    "My stomach will at least force me to be a lot more insistent. If miss Fortuna's really keen on being friendly, I might even find a decent vending machine instead."
     jump menu_dining_car
 
 label train_compartment_pa_delay:
@@ -453,6 +477,8 @@ label adam_pa_delay_how_late:
     "The man gives me a long look, then grunts lightly."
     an "We were SUPPOSED to arrive yesterday. But I imagine it's hard to keep track of time when you waste it all with sleep."
     me "Oh."
+    nvl clear
+    "A moment passes in silence during which I'm not sure whether I'm supposed to keep talking or just admit that it's not going to get all that much friendlier anyway."
     me "At least you've got a book to read. You seem pretty into it."
     an "Hah!"
     nvl clear
@@ -467,13 +493,13 @@ label adam_pa_delay_how_late:
     an "Get someone to make an attempt at explaining the reason for this hold-up."
     menu:
         "\"Well, alright then\"":
-            $ d1_adam_ask_conductor = "agreed"
-            $ an_like += 2
+            $ d1.adam_ask_conductor = "agreed"
+            $ adam.like(2)
             nvl clear
             me "Well, alright then."
             "The man blinks, then straightens up and picks his book up."
             "After a stern nod at me, and something that might be interpreted as a smile, he resumes reading again."
-            jump menu_train_compartment
+            jump location_train_compartment_7
         "\"Why don't you do it yourself?\"":
             nvl clear
             me "Why don't you do it yourself?"
@@ -487,34 +513,34 @@ label adam_pa_delay_how_late:
             an "Are you going to check with the conductor or not?"
             menu:
                 "\"I suppose I could\"":
-                    $ d1_adam_ask_conductor = "agreed"
-                    $ an_like += 1
+                    $ d1.adam_ask_conductor = "agreed"
+                    $ adam.like(1)
                     nvl clear
                     me "I suppose I could."
                     "The man blinks, then straightens up and picks his book up."
                     "After a stern nod at me he resumes reading again."
-                    jump menu_train_compartment
+                    jump location_train_compartment_7
                 "\"I'm not that interested\"":
-                    $ d1_adam_ask_conductor = "refused"
-                    $ an_like -= 2
+                    $ d1.adam_ask_conductor = "refused"
+                    $ adam.like(-2)
                     nvl clear
                     me "I'm not that interested."
                     an ".........."
                     an "Fine."
                     an "Fine!"
                     "The man picks up his book again violently and resumes reading."
-                    jump menu_train_compartment
+                    jump location_train_compartment_7
 
 label adam_searched_conductor:
     nvl clear
-    if d1_searched_conductor > 0:
-        $ an_like += 1
+    if d1.searched_conductor > 0:
+        $ adam.like(1)
         an "Hmm, that's certainly a shame."
         an "Though not a surprising one, given the ineptitude of the train personnel."
         "He rolls his eyes and sighs heavily."
         jump adam_after_searched_conductor
     else:
-        $ an_like -= 3
+        $ adam.like(-3)
         an "Don't take me for a fool!"
         "His fingers clench the book tightly and at least a few veins on his forehead pop."
         an "You've just been sitting right where you are!"
@@ -554,8 +580,8 @@ label adam_after_searched_conductor:
     nvl clear
     "He suddenly relaxes his intense observation of me."
     an "The name is Adam Nord."
-    $ an_name = "Adam"
-    if an_like < 0:
+    $ adam.name = "Adam"
+    if adam.affection < 0:
         an "It's my hope you'll feel less inclined to harass me now that you know my name."
     "I reach out my hand and he hesitantly shakes it."
     me "I'm Kim. Kim Erling."
@@ -568,39 +594,37 @@ label adam_after_searched_conductor:
     jump menu_adam_talk
 
 menu menu_adam_talk:
-    "\"What is it you're reading, anyway?\"" if d1_adam_discussed_book == False:
-        $ d1_adam_introduced = True
+    "\"What is it you're reading, anyway?\"" if d1.adam_discussed_book == False:
+        $ d1.adam_introduced = True
         jump adam_talk_reading
-    "\"Read this book?\" Hold out Brave New World" if d1_dining_car_book_taken and d1_adam_shown_bnw == False:
-        $ d1_adam_introduced = True
-        jump adam_talk_bnw
+    "Show him something":
+        $ d1.adam_introduced = True
+        call menu_show_items(adam)
+        jump menu_adam_talk
     "\"No, not really\"":
-        if d1_adam_introduced == False:
-            $ d1_adam_introduced = True
+        if d1.adam_introduced == False:
+            $ d1.adam_introduced = True
             jump adam_talk_bye
         else:
             an "Hrm."
             "He resumes reading with an annoyed expression."
-            jump menu_train_compartment
+            jump location_train_compartment_7
 
 label adam_talk_bye:
     nvl clear
     "Adam brings the book back up between us, but there's less hostility in the action now. Or maybe I'm just imagining things. It's not like I made the best of impressions on him."
     "But at least we're now on a name-knowing basis which, seeing how we're likely to spend at least a dozen more hours together, is a decent first step to having a less isolated trip."
-    jump menu_train_compartment
+    jump location_train_compartment_7
 
 #TODO content
 label adam_talk_reading:
-    $ an_like += 2
-    $ d1_adam_discussed_book = True
-    nvl clear
-
-#TODO content
-label adam_talk_bnw:
-    $ an_like += 2
-    $ d1_adam_shown_bnw = True
+    $ adam.like(2)
+    $ d1.adam_discussed_book = True
     nvl clear
 
 #TODO content
 label day_1_end:
     return
+
+    
+    
